@@ -57,9 +57,9 @@ jobs:
 
     env:
       Solution_Name: Invoice_Inventory_mgmt.sln                                      # Replace with your solution name, i.e. MyWpfApp.sln.
-      Test_Project_Path: API_UnitTests\API_UnitTests.csproj                          # Replace with the path to your test project, i.e. MyWpfApp.Tests\MyWpfApp.Tests.csproj.
+      Test_Project_Path: API_UnitTests.csproj                          # Replace with the path to your test project, i.e. MyWpfApp.Tests\MyWpfApp.Tests.csproj.
       Wap_Project_Directory: Invoice_Inventory_mgmt                                  # Replace with the Wap project directory relative to the solution, i.e. MyWpfApp.Package.
-      Wap_Project_Path: Invoice_Inventory_mgmt\Invoice_Inventory_mgmt.csproj         # Replace with the path to your Wap project, i.e. MyWpf.App.Package\MyWpfApp.Package.wapproj.
+      Wap_Project_Path: Invoice_Inventory_mgmt.csproj         # Replace with the path to your Wap project, i.e. MyWpf.App.Package\MyWpfApp.Package.wapproj.
 
     steps:
     - name: Checkout
