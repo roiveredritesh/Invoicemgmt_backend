@@ -1,4 +1,6 @@
-﻿namespace API_UnitTests.ControllerTests
+﻿using AutoFixture;
+
+namespace API_UnitTests.ControllerTests
 {
     public class CityMastersControllerTests
     {
@@ -11,13 +13,14 @@
                 .UseInMemoryDatabase(databaseName: "TestDatabase")
                 .Options;
 
+            // Auto-generate a list of CityMaster objects
+            var fixture = new Fixture();
+            fixture.Customize<CityMaster>(c => c.Without(x => x.CityID));
+            var cityMasters = fixture.CreateMany<CityMaster>(3).ToList();
+
             // Seed the in-memory database
             using var context = new AppDBContext(_options);
-            context.CityMasters.AddRange(
-                new CityMaster { CityID = 1, StateID = 2, CityName = "Jaipur" },
-                new CityMaster { CityID = 2, StateID = 2, CityName = "Ajmer" },
-                new CityMaster { CityID = 3, StateID = 2, CityName = "Udaipur" }
-            );
+            context.CityMasters.AddRange(cityMasters);
             context.SaveChanges();
         }
 
