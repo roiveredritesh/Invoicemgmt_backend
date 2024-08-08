@@ -92,5 +92,5 @@ jobs:
       run: |
         echo "${{ secrets.SSH_PRIVATE_KEY }}" > private_key.pem
         chmod 600 private_key.pem
-        scp -o StrictHostKeyChecking=no -i private_key.pem -r **/bin/${{ matrix.configuration }}/** ${{ env.EC2_USER }}@${{ env.EC2_HOST }}:/vssrepo/
+        scp -o StrictHostKeyChecking=no -i private_key.pem -r **/bin/${{ matrix.configuration }}/** ${{ env.EC2_USER }}@${{ env.EC2_HOST }}:/home/ubuntu/vssrepo
         rm private_key.pem
