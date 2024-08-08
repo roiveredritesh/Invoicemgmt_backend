@@ -52,7 +52,7 @@ jobs:
       matrix:
         configuration: [Debug, Release]
 
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
 
     env:
       Solution_Name: Invoice_Inventory_mgmt.sln
