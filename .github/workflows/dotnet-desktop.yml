@@ -52,14 +52,13 @@ jobs:
       matrix:
         configuration: [Debug, Release]
 
-    runs-on: windows-latest  # For a list of available runner types, refer to
-                             # https://help.github.com/en/actions/reference/workflow-syntax-for-github-actions#jobsjob_idruns-on
+    runs-on: windows-latest
 
     env:
-      Solution_Name: Invoice_Inventory_mgmt.sln                                      # Replace with your solution name, i.e. MyWpfApp.sln.
-      Test_Project_Path: API_UnitTests\API_UnitTests.csproj                          # Replace with the path to your test project, i.e. MyWpfApp.Tests\MyWpfApp.Tests.csproj.
-      Wap_Project_Directory: Invoice_Inventory_mgmt                                  # Replace with the Wap project directory relative to the solution, i.e. MyWpfApp.Package.
-      Wap_Project_Path: Invoice_Inventory_mgmt\Invoice_Inventory_mgmt.csproj         # Replace with the path to your Wap project, i.e. MyWpf.App.Package\MyWpfApp.Package.wapproj.
+      Solution_Name: Invoice_Inventory_mgmt.sln
+      Test_Project_Path: API_UnitTests\API_UnitTests.csproj
+      Wap_Project_Directory: Invoice_Inventory_mgmt
+      Wap_Project_Path: Invoice_Inventory_mgmt\Invoice_Inventory_mgmt.csproj
 
     steps:
     - name: Checkout
@@ -67,21 +66,17 @@ jobs:
       with:
         fetch-depth: 0
 
-    # Install the .NET Core workload
     - name: Install .NET Core
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: 8.0.x
 
-    # Add  MSBuild to the PATH: https://github.com/microsoft/setup-msbuild
     - name: Setup MSBuild.exe
       uses: microsoft/setup-msbuild@v2
 
-    # Execute all unit tests in the solution
     - name: Execute unit tests
       run: dotnet test
 
-    # Restore the application to populate the obj folder with RuntimeIdentifiers
     - name: Restore the application
       run: msbuild $env:Solution_Name /t:Restore /p:Configuration=$env:Configuration
       env:
@@ -110,5 +105,5 @@ jobs:
       run: |
         echo "${SSH_PRIVATE_KEY}" > private_key.pem
         chmod 600 private_key.pem
-        scp -o StrictHostKeyChecking=no -i private_key.pem -r **/bin/$env:Configuration/** $EC2_USER@$EC2_HOST:/vssrepo/
+        scp -o StrictHostKeyChecking=no -i private_key.pem -r **/bin/$env:Configuration/** $EC2_USER@$EC2_HOST:/path/to/your/directory/
         rm private_key.pem
