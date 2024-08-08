@@ -78,15 +78,11 @@ jobs:
       run: dotnet test
 
     - name: Restore the application
-      run: msbuild $env:Solution_Name /t:Restore /p:Configuration=$env:Configuration
-      env:
-        Configuration: ${{ matrix.configuration }}
+      run: msbuild ${{ env.Solution_Name }} /t:Restore /p:Configuration=${{ matrix.configuration }}
 
     # Build the project
     - name: Build the project
-      run: msbuild $env:Solution_Name /p:Configuration=$env:Configuration
-      env:
-        Configuration: ${{ matrix.configuration }}
+      run: msbuild ${{ env.Solution_Name }} /p:Configuration=${{ matrix.configuration }}
 
     # Archive the build artifacts
     - name: Archive build artifacts
@@ -94,7 +90,7 @@ jobs:
       with:
         name: build-artifacts
         path: |
-          **/bin/$env:Configuration/**
+          **/bin/${{ matrix.configuration }}/**
 
     # Upload the artifacts to EC2 instance
     - name: Upload artifacts to EC2
@@ -103,7 +99,8 @@ jobs:
         EC2_USER: ${{ secrets.EC2_USER }}
         SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
       run: |
-        echo "${SSH_PRIVATE_KEY}" > private_key.pem
+        echo "${{ secrets.SSH_PRIVATE_KEY }}" > private_key.pem
         chmod 600 private_key.pem
-        scp -o StrictHostKeyChecking=no -i private_key.pem -r **/bin/$env:Configuration/** $EC2_USER@$EC2_HOST:/path/to/your/directory/
+        scp -o StrictHostKeyChecking=no -i private_key.pem -r **/bin/${{ matrix.configuration }}/** ${{ env.EC2_USER }}@${{ env.EC2_HOST }}:/path/to/your/directory/
         rm private_key.pem
+
