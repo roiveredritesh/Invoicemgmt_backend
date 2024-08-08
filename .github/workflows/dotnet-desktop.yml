@@ -69,14 +69,11 @@ jobs:
       with:
         dotnet-version: 8.0.x
 
-    - name: Install MSBuild
-      uses: microsoft/setup-msbuild@v2
+    - name: Restore solution packages
+      run: dotnet restore ${{ env.Solution_Name }}
 
     - name: Run unit tests
       run: dotnet test ${{ env.Test_Project_Path }} --configuration ${{ matrix.configuration }}
-
-    - name: Restore solution packages
-      run: dotnet restore ${{ env.Solution_Name }}
 
     - name: Build solution
       run: dotnet build ${{ env.Solution_Name }} --configuration ${{ matrix.configuration }} --no-restore
@@ -97,4 +94,3 @@ jobs:
         chmod 600 private_key.pem
         scp -o StrictHostKeyChecking=no -i private_key.pem -r **/bin/${{ matrix.configuration }}/** ${{ env.EC2_USER }}@${{ env.EC2_HOST }}:/path/to/your/directory/
         rm private_key.pem
-
