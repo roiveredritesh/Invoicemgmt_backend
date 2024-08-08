@@ -36,7 +36,7 @@
 # For a complete CI/CD sample to get started with GitHub Action workflows for Desktop Applications,
 # refer to https://github.com/microsoft/github-actions-for-desktop-apps
 
-name: .NET Core Desktop
+name: .NET Core Desktop CI/CD
 
 on:
   push:
@@ -45,9 +45,7 @@ on:
     branches: [ "master" ]
 
 jobs:
-
   build:
-
     strategy:
       matrix:
         configuration: [Debug, Release]
@@ -56,44 +54,40 @@ jobs:
 
     env:
       Solution_Name: Invoice_Inventory_mgmt.sln
-      Test_Project_Path: API_UnitTests\API_UnitTests.csproj
+      Test_Project_Path: API_UnitTests/API_UnitTests.csproj
       Wap_Project_Directory: Invoice_Inventory_mgmt
-      Wap_Project_Path: Invoice_Inventory_mgmt\Invoice_Inventory_mgmt.csproj
+      Wap_Project_Path: Invoice_Inventory_mgmt/Invoice_Inventory_mgmt.csproj
 
     steps:
-    - name: Checkout
+    - name: Checkout code
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
 
-    - name: Install .NET Core
+    - name: Set up .NET Core
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: 8.0.x
 
-    - name: Setup MSBuild.exe
+    - name: Install MSBuild
       uses: microsoft/setup-msbuild@v2
 
-    - name: Execute unit tests
-      run: dotnet test
+    - name: Run unit tests
+      run: dotnet test ${{ env.Test_Project_Path }} --configuration ${{ matrix.configuration }}
 
-    - name: Restore the application
-      run: msbuild ${{ env.Solution_Name }} /t:Restore /p:Configuration=${{ matrix.configuration }}
+    - name: Restore solution packages
+      run: dotnet restore ${{ env.Solution_Name }}
 
-    # Build the project
-    - name: Build the project
-      run: msbuild ${{ env.Solution_Name }} /p:Configuration=${{ matrix.configuration }}
+    - name: Build solution
+      run: dotnet build ${{ env.Solution_Name }} --configuration ${{ matrix.configuration }} --no-restore
 
-    # Archive the build artifacts
     - name: Archive build artifacts
       uses: actions/upload-artifact@v3
       with:
         name: build-artifacts
-        path: |
-          **/bin/${{ matrix.configuration }}/**
+        path: '**/bin/${{ matrix.configuration }}/'
 
-    # Upload the artifacts to EC2 instance
-    - name: Upload artifacts to EC2
+    - name: Upload artifacts to EC2 instance
       env:
         EC2_HOST: ${{ secrets.EC2_HOST }}
         EC2_USER: ${{ secrets.EC2_USER }}
