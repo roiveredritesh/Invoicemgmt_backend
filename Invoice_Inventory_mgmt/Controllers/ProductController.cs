@@ -59,5 +59,27 @@ namespace Invoice_Inventory_mgmt.Controllers
             }
         }
 
+        [HttpGet]
+        public async Task<IActionResult> GetProductsById(int id)
+        {
+            try
+            {
+                if (id == 0)
+                {
+                    return BadRequest(new CustomResponse<object> { Code = 400, Message = "Invalid id.", Data = null });
+                }
+                var productCategory = await _productCategorySL.GetProductCategory(id);
+                if (productCategory == null)
+                {
+                    return NotFound(new CustomResponse<object> { Code = 404, Message = $"Product with ID {id} not found.", Data = null });
+                }
+                return Ok(new CustomResponse<List<ProductCategoryMaster>> { Code = 200, Message = "Success", Data = productCategory });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occurred while fetching product: {ex}");
+                return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while fetching product.");
+            }
+        }
     }
 }
