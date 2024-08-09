@@ -59,26 +59,30 @@ namespace Invoice_Inventory_mgmt.Controllers
             }
         }
 
-        [HttpGet]
-        public async Task<IActionResult> GetProductsById(int id)
+        [HttpGet("filter")]
+        public async Task<IActionResult> FilteredProducts(int businessid, string? status = null)
         {
             try
             {
-                if (id == 0)
+                if (string.IsNullOrEmpty(Convert.ToString(businessid)))
                 {
-                    return BadRequest(new CustomResponse<object> { Code = 400, Message = "Invalid id.", Data = null });
+                    return BadRequest(new CustomResponse<object> { Code = 400, Message = "Business id can not be blank.", Data = null });
                 }
-                var productCategory = await _productCategorySL.GetProductCategory(id);
-                if (productCategory == null)
+                if (businessid == 0)
                 {
-                    return NotFound(new CustomResponse<object> { Code = 404, Message = $"Product with ID {id} not found.", Data = null });
+                    return BadRequest(new CustomResponse<object> { Code = 400, Message = "Invalid business id.", Data = null });
                 }
-                return Ok(new CustomResponse<List<ProductCategoryMaster>> { Code = 200, Message = "Success", Data = productCategory });
+                var productCategoryList = await _productCategorySL.FilterProductCategoryListByStatus(businessid, status);
+                if (productCategoryList == null || !productCategoryList.Any())
+                {
+                    return NotFound(new CustomResponse<object> { Code = 404, Message = "No products found for the specified search criteria.", Data = null });
+                }
+                return Ok(new CustomResponse<List<ProductCategoryMaster>> { Code = 200, Message = "Success", Data = productCategoryList });
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"An error occurred while fetching product: {ex}");
-                return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while fetching product.");
+                Console.WriteLine($"An error occurred while fetching filtered products: {ex}");
+                return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while fetching filtered products.");
             }
         }
     }
