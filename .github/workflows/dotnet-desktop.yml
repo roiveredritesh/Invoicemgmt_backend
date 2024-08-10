@@ -84,7 +84,7 @@ jobs:
         name: build-artifacts
         path: '**/bin/${{ matrix.configuration }}/'
 
-    - name: Deploy to EC2 instance
+    - name: Upload artifacts to EC2 instance
       env:
         EC2_HOST: ${{ secrets.EC2_HOST }}
         EC2_USER: ${{ secrets.EC2_USER }}
@@ -93,16 +93,4 @@ jobs:
         echo "${{ secrets.SSH_PRIVATE_KEY }}" > private_key.pem
         chmod 600 private_key.pem
         scp -o StrictHostKeyChecking=no -i private_key.pem -r **/bin/${{ matrix.configuration }}/** ${{ env.EC2_USER }}@${{ env.EC2_HOST }}:/home/ubuntu/vssrepo
-        rm private_key.pem
-
-    - name: Restart application on EC2
-      env:
-        EC2_HOST: ${{ secrets.EC2_HOST }}
-        EC2_USER: ${{ secrets.EC2_USER }}
-        SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-      run: |
-        echo "${{ secrets.SSH_PRIVATE_KEY }}" > private_key.pem
-        chmod 600 private_key.pem
-        ssh -o StrictHostKeyChecking=no -i private_key.pem ${{ env.EC2_USER }}@${{ env.EC2_HOST }} 'pkill -f "dotnet run" || true'
-        ssh -o StrictHostKeyChecking=no -i private_key.pem ${{ env.EC2_USER }}@${{ env.EC2_HOST }} 'cd /home/ubuntu/vssrepo && nohup dotnet run &'
         rm private_key.pem
